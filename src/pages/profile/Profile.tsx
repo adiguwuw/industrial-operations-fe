@@ -123,8 +123,6 @@ export default function Profile() {
                   <UserAvatar
                     user={{
                       ...user,
-                      created_at: '',
-                      updated_at: '',
                     }}
                     size="lg"
                   />

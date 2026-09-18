@@ -165,6 +165,14 @@ export default function Dashboard() {
               Incidents
             </a>
 
+            <a
+              href="/tasks"
+              className="flex items-center gap-3 rounded-xl px-4 py-3 text-sm text-slate-400 transition hover:bg-slate-800 hover:text-white"
+            >
+              <CheckCircle2 className="h-5 w-5" />
+              Task Management
+            </a>
+
             {isAdmin && (
               <a
                 href="/users"

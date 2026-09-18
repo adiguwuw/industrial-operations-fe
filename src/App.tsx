@@ -7,6 +7,7 @@ import ReportIncident from './pages/incidents/ReportIncident';
 import Profile from './pages/profile/Profile';
 import Users from './pages/users/Users';
 import UserForm from './pages/users/UserForm';
+import Tasks from './pages/tasks/Tasks';
 
 type User = {
   roles?: string[];
@@ -173,6 +174,15 @@ export default function App() {
           <AdminRoute>
             <UserForm />
           </AdminRoute>
+        }
+      />
+
+      <Route
+        path="/tasks"
+        element={
+          <ProtectedRoute>
+            <Tasks />
+          </ProtectedRoute>
         }
       />
 
