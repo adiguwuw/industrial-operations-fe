@@ -164,3 +164,11 @@ export const getUserPhotoBlob = async (
 
   return response.data;
 };
+
+export const getTaskAssignees = async (): Promise<ManagedUser[]> => {
+  const response = await api.get<{ data: ManagedUser[] }>(
+    '/task-assignees',
+  );
+
+  return response.data.data;
+};

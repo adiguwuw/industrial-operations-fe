@@ -2,43 +2,18 @@ import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import {
   AlertTriangle,
-  BarChart3,
   ChevronLeft,
   ChevronRight,
   ClipboardList,
   Eye,
   Filter,
-  Plus,
   Search,
   ShieldAlert,
   User,
-  Users,
 } from 'lucide-react';
 
 import { getIncidents } from '../../services/incidents';
 import type { Incident } from '../../services/incidents';
-import UserProfileMenu from '../../components/UserProfileMenu';
-
-type StoredUser = {
-  id?: number;
-  name?: string;
-  email?: string;
-  roles?: string[];
-};
-
-function getStoredUser(): StoredUser | null {
-  try {
-    const stored = localStorage.getItem('user');
-
-    if (!stored) {
-      return null;
-    }
-
-    return JSON.parse(stored);
-  } catch {
-    return null;
-  }
-}
 
 const severityStyles: Record<
   Incident['severity'],
@@ -104,25 +79,6 @@ export default function Incidents() {
 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-
-  const user = getStoredUser();
-
-  const isAdmin = user?.roles?.includes('admin');
-
-  const canAccessDashboard =
-    isAdmin ||
-    user?.roles?.includes('k3-officer') ||
-    user?.roles?.includes('supervisor');
-
-  const canReportIncident =
-    user?.roles?.some((role) =>
-      [
-        'admin',
-        'employee',
-        'k3-officer',
-        'supervisor',
-      ].includes(role),
-    ) ?? false;
 
   const loadIncidents = async (targetPage = page) => {
     try {
@@ -191,135 +147,26 @@ export default function Incidents() {
   });
 
   return (
-    <div className="h-screen overflow-hidden bg-slate-950 text-slate-100">
-      <div className="flex h-screen">
-
-        {/* =====================================================
-            SIDEBAR
-        ====================================================== */}
-        <aside className="hidden h-screen w-64 shrink-0 flex-col border-r border-slate-800 bg-slate-900 lg:flex">
-
-          {/* Logo */}
-          <div className="flex h-20 shrink-0 items-center gap-3 border-b border-slate-800 px-6">
-            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-blue-600">
-              <ShieldAlert className="h-5 w-5 text-white" />
-            </div>
-
-            <div>
-              <div className="font-semibold text-white">
-                Industrial Ops
-              </div>
-
-              <div className="text-xs text-slate-500">
-                Operations Platform
-              </div>
-            </div>
-          </div>
-
-          {/* Navigation */}
-          <nav className="flex-1 space-y-1 overflow-y-auto p-4">
-
-            {/* Dashboard */}
-            {canAccessDashboard && (
-              <Link
-                to="/dashboard"
-                className="flex items-center gap-3 rounded-xl px-4 py-3 text-sm text-slate-400 transition hover:bg-slate-800 hover:text-white"
-              >
-                <BarChart3 className="h-5 w-5" />
-                Dashboard
-              </Link>
-            )}
-
-            {/* Incidents - Active */}
-            <Link
-              to="/incidents"
-              className="flex items-center gap-3 rounded-xl bg-blue-600/10 px-4 py-3 text-sm font-medium text-blue-400"
-            >
-              <AlertTriangle className="h-5 w-5" />
-              Incidents
-            </Link>
-
-            {/* User Management - Admin Only */}
-            {isAdmin && (
-              <Link
-                to="/users"
-                className="flex items-center gap-3 rounded-xl px-4 py-3 text-sm text-slate-400 transition hover:bg-slate-800 hover:text-white"
-              >
-                <Users className="h-5 w-5" />
-                User Management
-              </Link>
-            )}
-
-          </nav>
-
-          {/* Profile / Logout */}
-          <UserProfileMenu />
-
-        </aside>
-
-        {/* =====================================================
-            MAIN CONTENT
-        ====================================================== */}
-        <main className="flex min-w-0 flex-1 flex-col overflow-hidden">
-
-          {/* Header */}
-          <header className="flex h-20 shrink-0 items-center justify-between border-b border-slate-800 bg-slate-900/70 px-6 lg:px-8">
-            <div>
-              <h1 className="text-lg font-semibold text-white">
-                Incident Management
-              </h1>
-
-              <p className="text-sm text-slate-500">
-                Monitor incidents and operational safety.
-              </p>
-            </div>
-
-            {canReportIncident && (
-              <Link
-                to="/incidents/report"
-                className="hidden items-center gap-2 rounded-xl bg-blue-600 px-4 py-2.5 text-sm font-medium text-white transition hover:bg-blue-500 sm:inline-flex"
-              >
-                <Plus className="h-4 w-4" />
-                Report Incident
-              </Link>
-            )}
-          </header>
-
-          {/* Scrollable Content */}
-          <div className="flex-1 overflow-y-auto">
-            <div className="space-y-6 p-6 lg:p-8">
-
+    <div className="space-y-6 p-6 lg:p-8">
               {/* Page Header */}
-              <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
+              <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                 <div>
-                  <div className="mb-2 flex items-center gap-2 text-blue-400">
-                    <ClipboardList className="h-5 w-5" />
-
-                    <span className="text-sm font-medium">
-                      Incident Management
-                    </span>
-                  </div>
-
-                  <h2 className="text-3xl font-bold tracking-tight text-white">
-                    Incidents
-                  </h2>
-
-                  <p className="mt-2 text-slate-400">
-                    Monitor, investigate, and manage operational incidents.
+                  <h1 className="text-2xl font-bold text-white">
+                    Incident Management
+                  </h1>
+                  <p className="mt-1 text-sm text-slate-400">
+                    Monitor and manage industrial incident reports.
                   </p>
                 </div>
 
-                {/* Mobile / visible alternative */}
-                {canReportIncident && (
-                  <Link
-                    to="/incidents/report"
-                    className="inline-flex items-center justify-center gap-2 rounded-xl bg-blue-600 px-5 py-3 text-sm font-semibold text-white transition hover:bg-blue-500 sm:hidden"
-                  >
-                    <Plus className="h-5 w-5" />
-                    Report Incident
-                  </Link>
-                )}
+                <Link
+                  to="/incidents/report"
+                  className="inline-flex items-center justify-center rounded-xl bg-blue-600 px-4 py-3 text-sm font-medium text-white transition hover:bg-blue-500"
+                >
+                  Report Incident
+                </Link>
               </div>
+
 
               {/* =================================================
                   SUMMARY CARDS
@@ -716,9 +563,5 @@ export default function Incidents() {
               </div>
 
             </div>
-          </div>
-        </main>
-      </div>
-    </div>
   );
 }

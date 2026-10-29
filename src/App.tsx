@@ -1,13 +1,32 @@
+
+import { lazy, Suspense } from 'react';
 import { Navigate, Route, Routes } from 'react-router-dom';
-import Login from './pages/auth/Login';
-import Dashboard from './pages/dashboard/Dashboard';
-import Incidents from './pages/incidents/Incidents';
-import IncidentDetail from './pages/incidents/IncidentDetail';
-import ReportIncident from './pages/incidents/ReportIncident';
-import Profile from './pages/profile/Profile';
-import Users from './pages/users/Users';
-import UserForm from './pages/users/UserForm';
-import Tasks from './pages/tasks/Tasks';
+import { Loader2 } from 'lucide-react';
+
+import AppShell from './components/layout/AppShell';
+
+const Login = lazy(() => import('./pages/auth/Login'));
+const Dashboard = lazy(() => import('./pages/dashboard/Dashboard'));
+const Incidents = lazy(() => import('./pages/incidents/Incidents'));
+const IncidentDetail = lazy(() => import('./pages/incidents/IncidentDetail'));
+const ReportIncident = lazy(() => import('./pages/incidents/ReportIncident'));
+const Profile = lazy(() => import('./pages/profile/Profile'));
+const Users = lazy(() => import('./pages/users/Users'));
+const UserForm = lazy(() => import('./pages/users/UserForm'));
+const Tasks = lazy(() => import('./pages/tasks/Tasks'));
+const Inspections = lazy(() => import('./pages/inspections/Inspections'));
+const InspectionDetail = lazy(() => import('./pages/inspections/InspectionDetail'));
+const InspectionForm = lazy(() => import('./pages/inspections/InspectionForm'));
+const Checklists = lazy(() => import('./pages/checklists/Checklists'));
+const ChecklistForm = lazy(() => import('./pages/checklists/ChecklistForm'));
+
+function PageLoader() {
+  return (
+    <div className="flex min-h-96 items-center justify-center">
+      <Loader2 className="h-8 w-8 animate-spin text-blue-500" />
+    </div>
+  );
+}
 
 type User = {
   roles?: string[];
@@ -62,20 +81,39 @@ function AdminRoute({
   return children;
 }
 
-function DashboardRoute() {
+function K3ManagementRoute({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   const token = localStorage.getItem('token');
   const user = getStoredUser();
+  const roles = user?.roles ?? [];
 
   if (!token) {
     return <Navigate to="/login" replace />;
   }
 
+  const canAccess =
+    roles.includes('admin') ||
+    roles.includes('k3-officer');
+
+  if (!canAccess) {
+    return <Navigate to="/incidents" replace />;
+  }
+
+  return children;
+}
+
+function DashboardRoute() {
+  const user = getStoredUser();
   const roles = user?.roles ?? [];
 
   const canAccessDashboard =
     roles.includes('admin') ||
     roles.includes('k3-officer') ||
-    roles.includes('supervisor');
+    roles.includes('supervisor') ||
+    roles.includes('employee');
 
   if (!canAccessDashboard) {
     return <Navigate to="/incidents" replace />;
@@ -83,6 +121,7 @@ function DashboardRoute() {
 
   return <Dashboard />;
 }
+
 
 function HomeRedirect() {
   const token = localStorage.getItem('token');
@@ -97,7 +136,8 @@ function HomeRedirect() {
   const canAccessDashboard =
     roles.includes('admin') ||
     roles.includes('k3-officer') ||
-    roles.includes('supervisor');
+    roles.includes('supervisor') ||
+    roles.includes('employee');
 
   return (
     <Navigate
@@ -107,88 +147,139 @@ function HomeRedirect() {
   );
 }
 
+
+
 export default function App() {
   return (
-    <Routes>
-      <Route path="/login" element={<Login />} />
+    <Suspense fallback={<PageLoader />}>
+      <Routes>
+        {/* Public */}
+        <Route path="/login" element={<Login />} />
 
-      <Route path="/dashboard" element={<DashboardRoute />} />
+        {/* Protected application shell */}
+        <Route
+          element={
+            <ProtectedRoute>
+              <AppShell />
+            </ProtectedRoute>
+          }
+        >
+          {/* Dashboard */}
+          <Route
+            path="/dashboard"
+            element={<DashboardRoute />}
+          />
 
-      <Route
-        path="/incidents"
-        element={
-          <ProtectedRoute>
-            <Incidents />
-          </ProtectedRoute>
-        }
-      />
+          {/* Incident Management */}
+          <Route
+            path="/incidents"
+            element={<Incidents />}
+          />
 
-      <Route
-        path="/incidents/:id"
-        element={
-          <ProtectedRoute>
-            <IncidentDetail />
-          </ProtectedRoute>
-        }
-      />
+          <Route
+            path="/incidents/:id"
+            element={<IncidentDetail />}
+          />
 
-      <Route
-        path="/incidents/report"
-        element={
-          <ProtectedRoute>
-            <ReportIncident />
-          </ProtectedRoute>
-        }
-      />
+          <Route
+            path="/incidents/report"
+            element={<ReportIncident />}
+          />
 
-      <Route
-        path="/profile"
-        element={
-          <ProtectedRoute>
-            <Profile />
-          </ProtectedRoute>
-        }
-      />
+          {/* Safety Inspection */}
+          <Route
+            path="/inspections"
+            element={
+              <K3ManagementRoute>
+                <Inspections />
+              </K3ManagementRoute>
+            }
+          />
 
-      <Route
-        path="/users"
-        element={
-          <ProtectedRoute>
-            <Users />
-          </ProtectedRoute>
-        }
-      />
+          <Route
+            path="/inspections/new"
+            element={
+              <K3ManagementRoute>
+                <InspectionForm />
+              </K3ManagementRoute>
+            }
+          />
 
-      <Route
-        path="/users/new"
-        element={
-          <AdminRoute>
-            <UserForm />
-          </AdminRoute>
-        }
-      />
+          <Route
+            path="/inspections/:id"
+            element={
+              <K3ManagementRoute>
+                <InspectionDetail />
+              </K3ManagementRoute>
+            }
+          />
 
-      <Route
-        path="/users/:id/edit"
-        element={
-          <AdminRoute>
-            <UserForm />
-          </AdminRoute>
-        }
-      />
+          {/* Checklists */}
+          <Route
+            path="/checklists"
+            element={
+              <K3ManagementRoute>
+                <Checklists />
+              </K3ManagementRoute>
+            }
+          />
 
-      <Route
-        path="/tasks"
-        element={
-          <ProtectedRoute>
-            <Tasks />
-          </ProtectedRoute>
-        }
-      />
+          <Route
+            path="/checklists/new"
+            element={
+              <K3ManagementRoute>
+                <ChecklistForm />
+              </K3ManagementRoute>
+            }
+          />
 
-      <Route path="/" element={<HomeRedirect />} />
+          {/* Task Management */}
+          <Route
+            path="/tasks"
+            element={<Tasks />}
+          />
 
-      <Route path="*" element={<HomeRedirect />} />
-    </Routes>
+          {/* Profile */}
+          <Route
+            path="/profile"
+            element={<Profile />}
+          />
+
+          {/* Administration: Admin only */}
+          <Route
+            path="/users"
+            element={
+              <AdminRoute>
+                <Users />
+              </AdminRoute>
+            }
+          />
+
+          <Route
+            path="/users/new"
+            element={
+              <AdminRoute>
+                <UserForm />
+              </AdminRoute>
+            }
+          />
+
+          <Route
+            path="/users/:id/edit"
+            element={
+              <AdminRoute>
+                <UserForm />
+              </AdminRoute>
+            }
+          />
+        </Route>
+
+        {/* Root */}
+        <Route path="/" element={<HomeRedirect />} />
+
+        {/* Unknown routes */}
+        <Route path="*" element={<HomeRedirect />} />
+      </Routes>
+    </Suspense>
   );
 }

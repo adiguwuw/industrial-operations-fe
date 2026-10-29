@@ -1,24 +1,14 @@
 import { useEffect, useState } from 'react';
 import type { ChangeEvent, FormEvent } from 'react';
+import { AlertTriangle, ArrowLeft, Camera, Loader2, Save, Users } from 'lucide-react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
-import {
-  AlertTriangle,
-  ArrowLeft,
-  BarChart3,
-  Camera,
-  Loader2,
-  Save,
-  ShieldAlert,
-  Users,
-} from 'lucide-react';
+
 import {
   createUser,
   getUser,
   updateUser,
   type ManagedUser,
 } from '../../services/user';
-
-import UserProfileMenu from '../../components/UserProfileMenu';
 
 import UserAvatar from '../../components/UserAvatar';
 
@@ -46,6 +36,7 @@ const initialForm: FormState = {
 function getStoredUser() {
   try {
     const stored = localStorage.getItem('user');
+
     return stored ? JSON.parse(stored) : null;
   } catch {
     return null;
@@ -224,7 +215,7 @@ export default function UserForm() {
         <div className="rounded-2xl border border-slate-800 bg-slate-900 p-8 text-center">
           <AlertTriangle className="mx-auto mb-4 h-10 w-10 text-red-400" />
 
-          <h1 className="text-xl font-semibold">
+          <h1 className="text-xl font-semibold text-white">
             Access Denied
           </h1>
 
@@ -253,330 +244,240 @@ export default function UserForm() {
   }
 
   return (
-    <div className="h-screen overflow-hidden bg-slate-950 text-slate-100">
-      <div className="flex h-screen">
+    <div className="space-y-6 p-6 lg:p-8">
+      <div className="mx-auto w-full max-w-4xl space-y-6">
+        {/* Back */}
+        <Link
+          to="/users"
+          className="inline-flex items-center gap-2 text-sm text-slate-400 transition hover:text-white"
+        >
+          <ArrowLeft size={17} />
+          Back to Users
+        </Link>
 
-        {/* =====================================================
-            SIDEBAR
-        ====================================================== */}
-        <aside className="hidden h-screen w-64 shrink-0 flex-col border-r border-slate-800 bg-slate-900 lg:flex">
-
-          {/* Logo */}
-          <div className="flex h-20 shrink-0 items-center gap-3 border-b border-slate-800 px-6">
-            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-blue-600">
-              <ShieldAlert className="h-5 w-5 text-white" />
+        {/* Title */}
+        <div>
+          <div className="mb-2 flex items-center gap-3">
+            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-blue-500/10 text-blue-400">
+              <Users size={21} />
             </div>
 
-            <div>
-              <div className="font-semibold text-white">
-                Industrial Ops
-              </div>
-
-              <div className="text-xs text-slate-500">
-                Operations Platform
-              </div>
-            </div>
+            <h1 className="text-2xl font-semibold text-white">
+              {isEdit ? 'Edit User' : 'Add User'}
+            </h1>
           </div>
 
-          {/* Navigation */}
-          <nav className="flex-1 space-y-1 overflow-y-auto p-4">
+          <p className="text-sm text-slate-400">
+            {isEdit
+              ? 'Update user information, role, password, or profile photo.'
+              : 'Create a new user account for the Industrial Operations platform.'}
+          </p>
+        </div>
 
-            <Link
-              to="/dashboard"
-              className="flex items-center gap-3 rounded-xl px-4 py-3 text-sm text-slate-400 transition hover:bg-slate-800 hover:text-white"
-            >
-              <BarChart3 className="h-5 w-5" />
-              Dashboard
-            </Link>
+        {/* Error */}
+        {error && (
+          <div className="rounded-xl border border-red-500/20 bg-red-500/10 p-4 text-sm text-red-300">
+            {error}
+          </div>
+        )}
 
-            <Link
-              to="/incidents"
-              className="flex items-center gap-3 rounded-xl px-4 py-3 text-sm text-slate-400 transition hover:bg-slate-800 hover:text-white"
-            >
-              <AlertTriangle className="h-5 w-5" />
-              Incidents
-            </Link>
-
-            <Link
-              to="/users"
-              className="flex items-center gap-3 rounded-xl bg-blue-600/10 px-4 py-3 text-sm font-medium text-blue-400"
-            >
-              <Users className="h-5 w-5" />
-              User Management
-            </Link>
-
-          </nav>
-
-          <UserProfileMenu />
-        </aside>
-
-        {/* =====================================================
-            MAIN
-        ====================================================== */}
-        <main className="flex min-w-0 flex-1 flex-col overflow-hidden">
-
-          {/* Header */}
-          <header className="flex h-20 shrink-0 items-center justify-between border-b border-slate-800 bg-slate-900/70 px-6 lg:px-8">
+        {/* Form */}
+        <form
+          onSubmit={handleSubmit}
+          className="rounded-2xl border border-slate-800 bg-slate-900"
+        >
+          <div className="space-y-6 p-6">
+            {/* Account Information */}
             <div>
-              <h1 className="text-lg font-semibold text-white">
-                User Management
-              </h1>
+              <h2 className="font-semibold text-white">
+                Account Information
+              </h2>
 
-              <p className="text-sm text-slate-500">
-                Manage system users, roles, and access.
+              <p className="mt-1 text-sm text-slate-500">
+                Basic information used for authentication.
               </p>
             </div>
-          </header>
 
-          {/* Content */}
-          <div className="flex-1 overflow-y-auto">
-            <div className="mx-auto w-full max-w-4xl space-y-6 p-6 lg:p-8">
-
-              {/* Back */}
-              <Link
-                to="/users"
-                className="inline-flex items-center gap-2 text-sm text-slate-400 transition hover:text-white"
+            {/* Name */}
+            <div>
+              <label
+                htmlFor="name"
+                className="mb-2 block text-sm font-medium text-slate-300"
               >
-                <ArrowLeft size={17} />
-                Back to Users
-              </Link>
+                Full Name
+              </label>
 
-              {/* Title */}
-              <div>
-                <div className="mb-2 flex items-center gap-3">
-                  <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-blue-500/10 text-blue-400">
-                    <Users size={21} />
-                  </div>
+              <input
+                id="name"
+                name="name"
+                type="text"
+                value={form.name}
+                onChange={handleChange}
+                placeholder="Enter full name"
+                required
+                className="w-full rounded-xl border border-slate-700 bg-slate-950 px-4 py-3 text-sm text-white outline-none placeholder:text-slate-600 focus:border-blue-500"
+              />
+            </div>
 
-                  <h2 className="text-2xl font-semibold text-white">
-                    {isEdit ? 'Edit User' : 'Add User'}
-                  </h2>
-                </div>
-
-                <p className="text-sm text-slate-400">
-                  {isEdit
-                    ? 'Update user information, role, password, or profile photo.'
-                    : 'Create a new user account for the Industrial Operations platform.'}
-                </p>
-              </div>
-
-              {/* Error */}
-              {error && (
-                <div className="rounded-xl border border-red-500/20 bg-red-500/10 p-4 text-sm text-red-300">
-                  {error}
-                </div>
-              )}
-
-              {/* Form */}
-              <form
-                onSubmit={handleSubmit}
-                className="rounded-2xl border border-slate-800 bg-slate-900"
+            {/* Email */}
+            <div>
+              <label
+                htmlFor="email"
+                className="mb-2 block text-sm font-medium text-slate-300"
               >
-                <div className="space-y-6 p-6">
+                Email
+              </label>
 
-                  {/* Personal Information */}
-                  <div>
-                    <h3 className="font-semibold text-white">
-                      Account Information
-                    </h3>
+              <input
+                id="email"
+                name="email"
+                type="email"
+                value={form.email}
+                onChange={handleChange}
+                placeholder="name@company.com"
+                required
+                className="w-full rounded-xl border border-slate-700 bg-slate-950 px-4 py-3 text-sm text-white outline-none placeholder:text-slate-600 focus:border-blue-500"
+              />
+            </div>
 
-                    <p className="mt-1 text-sm text-slate-500">
-                      Basic information used for authentication.
-                    </p>
-                  </div>
+            {/* Role */}
+            <div>
+              <label
+                htmlFor="role"
+                className="mb-2 block text-sm font-medium text-slate-300"
+              >
+                Role
+              </label>
 
-                  {/* Name */}
-                  <div>
-                    <label
-                      htmlFor="name"
-                      className="mb-2 block text-sm font-medium text-slate-300"
-                    >
-                      Full Name
-                    </label>
-
-                    <input
-                      id="name"
-                      name="name"
-                      type="text"
-                      value={form.name}
-                      onChange={handleChange}
-                      placeholder="Enter full name"
-                      required
-                      className="w-full rounded-xl border border-slate-700 bg-slate-950 px-4 py-3 text-sm text-white outline-none placeholder:text-slate-600 focus:border-blue-500"
-                    />
-                  </div>
-
-                  {/* Email */}
-                  <div>
-                    <label
-                      htmlFor="email"
-                      className="mb-2 block text-sm font-medium text-slate-300"
-                    >
-                      Email
-                    </label>
-
-                    <input
-                      id="email"
-                      name="email"
-                      type="email"
-                      value={form.email}
-                      onChange={handleChange}
-                      placeholder="name@company.com"
-                      required
-                      className="w-full rounded-xl border border-slate-700 bg-slate-950 px-4 py-3 text-sm text-white outline-none placeholder:text-slate-600 focus:border-blue-500"
-                    />
-                  </div>
-
-                  {/* Role */}
-                  <div>
-                    <label
-                      htmlFor="role"
-                      className="mb-2 block text-sm font-medium text-slate-300"
-                    >
-                      Role
-                    </label>
-
-                    <select
-                      id="role"
-                      name="role"
-                      value={form.role}
-                      onChange={handleChange}
-                      required
-                      className="w-full rounded-xl border border-slate-700 bg-slate-950 px-4 py-3 text-sm text-slate-200 outline-none focus:border-blue-500"
-                    >
-                      {ROLES.map((role) => (
-                        <option
-                          key={role.value}
-                          value={role.value}
-                        >
-                          {role.label}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-
-                  {/* Password */}
-                  <div>
-                    <label
-                      htmlFor="password"
-                      className="mb-2 block text-sm font-medium text-slate-300"
-                    >
-                      Password
-                      {isEdit && (
-                        <span className="ml-2 text-xs font-normal text-slate-500">
-                          Leave blank to keep current password
-                        </span>
-                      )}
-                    </label>
-
-                    <input
-                      id="password"
-                      name="password"
-                      type="password"
-                      value={form.password}
-                      onChange={handleChange}
-                      placeholder={
-                        isEdit
-                          ? 'Enter new password'
-                          : 'Minimum 8 characters'
-                      }
-                      required={!isEdit}
-                      minLength={8}
-                      className="w-full rounded-xl border border-slate-700 bg-slate-950 px-4 py-3 text-sm text-white outline-none placeholder:text-slate-600 focus:border-blue-500"
-                    />
-                  </div>
-
-                  {/* Profile Photo */}
-                  <div>
-                    <label className="mb-2 block text-sm font-medium text-slate-300">
-                      Profile Photo
-                    </label>
-
-                    <div className="rounded-xl border border-dashed border-slate-700 bg-slate-950 p-5">
-
-                      <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
-
-                        {/* Existing / Preview */}
-                        <div className="flex h-20 w-20 shrink-0 items-center justify-center overflow-hidden rounded-full border border-slate-700 bg-slate-800">
-
-                          {photo ? (
-                                <img
-                                    src={URL.createObjectURL(photo)}
-                                    alt="Preview"
-                                    className="h-full w-full object-cover"
-                                />
-                                ) : existingUser ? (
-                                <UserAvatar
-                                    user={existingUser}
-                                    size="lg"
-                                />
-                                ) : (
-                                <Camera className="h-7 w-7 text-slate-500" />
-                                )}
-                        </div>
-
-                        <div className="flex-1">
-                          <input
-                            id="profile_photo"
-                            type="file"
-                            accept="image/jpeg,image/png,image/webp"
-                            onChange={handlePhotoChange}
-                            className="block w-full text-sm text-slate-400 file:mr-4 file:rounded-lg file:border-0 file:bg-blue-600 file:px-4 file:py-2 file:text-sm file:font-medium file:text-white hover:file:bg-blue-500"
-                          />
-
-                          <p className="mt-2 text-xs text-slate-500">
-                            JPG, PNG, or WEBP. Maximum 5 MB.
-                          </p>
-
-                          {photo && (
-                            <p className="mt-1 text-xs text-blue-400">
-                              Selected: {photo.name}
-                            </p>
-                          )}
-                        </div>
-
-                      </div>
-                    </div>
-                  </div>
-
-                </div>
-
-                {/* Form Actions */}
-                <div className="flex flex-col-reverse gap-3 border-t border-slate-800 px-6 py-5 sm:flex-row sm:justify-end">
-
-                  <Link
-                    to="/users"
-                    className="inline-flex items-center justify-center rounded-xl border border-slate-700 px-5 py-2.5 text-sm font-medium text-slate-300 transition hover:bg-slate-800"
+              <select
+                id="role"
+                name="role"
+                value={form.role}
+                onChange={handleChange}
+                required
+                className="w-full rounded-xl border border-slate-700 bg-slate-950 px-4 py-3 text-sm text-slate-200 outline-none focus:border-blue-500"
+              >
+                {ROLES.map((role) => (
+                  <option
+                    key={role.value}
+                    value={role.value}
                   >
-                    Cancel
-                  </Link>
+                    {role.label}
+                  </option>
+                ))}
+              </select>
+            </div>
 
-                  <button
-                    type="submit"
-                    disabled={saving}
-                    className="inline-flex items-center justify-center gap-2 rounded-xl bg-blue-600 px-5 py-2.5 text-sm font-medium text-white transition hover:bg-blue-500 disabled:cursor-not-allowed disabled:opacity-50"
-                  >
-                    {saving ? (
-                      <>
-                        <Loader2 className="h-4 w-4 animate-spin" />
-                        Saving...
-                      </>
+            {/* Password */}
+            <div>
+              <label
+                htmlFor="password"
+                className="mb-2 block text-sm font-medium text-slate-300"
+              >
+                Password
+
+                {isEdit && (
+                  <span className="ml-2 text-xs font-normal text-slate-500">
+                    Leave blank to keep current password
+                  </span>
+                )}
+              </label>
+
+              <input
+                id="password"
+                name="password"
+                type="password"
+                value={form.password}
+                onChange={handleChange}
+                placeholder={
+                  isEdit
+                    ? 'Enter new password'
+                    : 'Minimum 8 characters'
+                }
+                required={!isEdit}
+                minLength={8}
+                className="w-full rounded-xl border border-slate-700 bg-slate-950 px-4 py-3 text-sm text-white outline-none placeholder:text-slate-600 focus:border-blue-500"
+              />
+            </div>
+
+            {/* Profile Photo */}
+            <div>
+              <label className="mb-2 block text-sm font-medium text-slate-300">
+                Profile Photo
+              </label>
+
+              <div className="rounded-xl border border-dashed border-slate-700 bg-slate-950 p-5">
+                <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
+                  {/* Existing / Preview */}
+                  <div className="flex h-20 w-20 shrink-0 items-center justify-center overflow-hidden rounded-full border border-slate-700 bg-slate-800">
+                    {photo ? (
+                      <img
+                        src={URL.createObjectURL(photo)}
+                        alt="Preview"
+                        className="h-full w-full object-cover"
+                      />
+                    ) : existingUser ? (
+                      <UserAvatar
+                        user={existingUser}
+                        size="lg"
+                      />
                     ) : (
-                      <>
-                        <Save className="h-4 w-4" />
-                        {isEdit
-                          ? 'Save Changes'
-                          : 'Create User'}
-                      </>
+                      <Camera className="h-7 w-7 text-slate-500" />
                     )}
-                  </button>
+                  </div>
 
+                  <div className="flex-1">
+                    <input
+                      id="profile_photo"
+                      type="file"
+                      accept="image/jpeg,image/png,image/webp"
+                      onChange={handlePhotoChange}
+                      className="block w-full text-sm text-slate-400 file:mr-4 file:rounded-lg file:border-0 file:bg-blue-600 file:px-4 file:py-2 file:text-sm file:font-medium file:text-white hover:file:bg-blue-500"
+                    />
+
+                    <p className="mt-2 text-xs text-slate-500">
+                      JPG, PNG, or WEBP. Maximum 5 MB.
+                    </p>
+
+                    {photo && (
+                      <p className="mt-1 text-xs text-blue-400">
+                        Selected: {photo.name}
+                      </p>
+                    )}
+                  </div>
                 </div>
-              </form>
-
+              </div>
             </div>
           </div>
-        </main>
+
+          {/* Form Actions */}
+          <div className="flex flex-col-reverse gap-3 border-t border-slate-800 px-6 py-5 sm:flex-row sm:justify-end">
+            <Link
+              to="/users"
+              className="inline-flex items-center justify-center rounded-xl border border-slate-700 px-5 py-2.5 text-sm font-medium text-slate-300 transition hover:bg-slate-800"
+            >
+              Cancel
+            </Link>
+
+            <button
+              type="submit"
+              disabled={saving}
+              className="inline-flex items-center justify-center gap-2 rounded-xl bg-blue-600 px-5 py-2.5 text-sm font-medium text-white transition hover:bg-blue-500 disabled:cursor-not-allowed disabled:opacity-50"
+            >
+              {saving ? (
+                <>
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                  Saving...
+                </>
+              ) : (
+                <>
+                  <Save className="h-4 w-4" />
+                  {isEdit ? 'Save Changes' : 'Create User'}
+                </>
+              )}
+            </button>
+          </div>
+        </form>
       </div>
     </div>
   );
