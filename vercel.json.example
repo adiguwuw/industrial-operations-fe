@@ -3,11 +3,15 @@
   "rewrites": [
     {
       "source": "/api/:path*",
-      "destination": "https://YOUR-RENDER-API.onrender.com/api/:path*"
+      "destination": "https://YOUR-VERCEL-API.vercel.app/api/:path*"
+    },
+    {
+      "source": "/users/:id/photo",
+      "destination": "https://YOUR-VERCEL-API.vercel.app/api/users/:id/photo"
     },
     {
       "source": "/storage/:path*",
-      "destination": "https://YOUR-RENDER-API.onrender.com/storage/:path*"
+      "destination": "https://YOUR-VERCEL-API.vercel.app/storage/:path*"
     },
     {
       "source": "/(.*)",
