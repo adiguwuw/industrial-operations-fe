@@ -143,9 +143,9 @@ export const getUserPhotoUrl = (
     return null;
   }
 
-  const baseUrl = 'http://127.0.0.1:8000/api';
-
-  return `${baseUrl}${user.profile_photo_url}`;
+  return user.profile_photo_url.startsWith('/')
+    ? user.profile_photo_url
+    : `/storage/${user.profile_photo_url}`;
 };
 
 export const getUserPhotoBlob = async (

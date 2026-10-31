@@ -24,16 +24,12 @@ import {
   type TaskReviewDecision,
 } from '../../services/tasks';
 
-const API_BASE_URL =
-  import.meta.env.VITE_API_URL?.replace(/\/api\/?$/, '') ||
-  'http://localhost:8000';
-
 type TaskFilter = 'all' | TaskStatus;
 type PhotoType = 'before' | 'after';
 
 function getEvidenceUrl(path: string | null | undefined): string | null {
   if (!path) return null;
-  return `${API_BASE_URL}/storage/${path}`;
+  return `/storage/${path}`;
 }
 
 function formatDate(date: string): string {
