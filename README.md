@@ -139,7 +139,7 @@ For local browser access, open http://localhost:8080. The published port is boun
 
 ## Deployment to Vercel
 
-The `vercel.json.example` file contains Vercel rewrites for this SPA. After the backend Vercel project has a URL, copy this file to `vercel.json` and replace `YOUR-VERCEL-API` with the backend hostname (without a trailing slash). The rewrites send `/api/*`, profile-photo requests, and `/storage/*` to Laravel; React Router routes fall back to `index.html`. The backend currently stores uploads in temporary Vercel storage, so uploaded photos can disappear when an instance is recycled.
+The `vercel.json` file routes API, profile-photo, and storage requests to the backend at https://industrial-operations.vercel.app. React Router routes fall back to `index.html`. The `vercel.json.example` file is a template to update if the backend hostname changes. Backend uploads currently use temporary Vercel storage, so uploaded photos can disappear when an instance is recycled.
 
 Import this repository as a Vite project in Vercel. Use `npm run build` as the build command and `dist` as the output directory. The app already uses same-origin `/api` requests, so it does not need a `VITE_API_BASE_URL` variable in production.
 

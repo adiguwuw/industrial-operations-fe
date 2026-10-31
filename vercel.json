@@ -1,0 +1,21 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "rewrites": [
+    {
+      "source": "/api/:path*",
+      "destination": "https://industrial-operations.vercel.app/api/:path*"
+    },
+    {
+      "source": "/users/:id/photo",
+      "destination": "https://industrial-operations.vercel.app/api/users/:id/photo"
+    },
+    {
+      "source": "/storage/:path*",
+      "destination": "https://industrial-operations.vercel.app/storage/:path*"
+    },
+    {
+      "source": "/(.*)",
+      "destination": "/index.html"
+    }
+  ]
+}
