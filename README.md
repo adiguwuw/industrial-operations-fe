@@ -136,3 +136,9 @@ docker compose -f compose.yaml --env-file .env.docker up -d --build
 ~~~
 
 For local browser access, open http://localhost:8080. The published port is bound to the local machine only. In production, configure Nginx Proxy Manager to forward the application domain to the frontend service on port 80.
+
+## Deployment to Vercel
+
+The `vercel.json.example` file contains the Vercel rewrites for this SPA. After the Render API has a URL, copy it to `vercel.json` and replace `YOUR-RENDER-API` with the Render hostname (without a trailing slash). The rewrites send `/api/*` and `/storage/*` requests to Laravel; React Router routes fall back to `index.html`.
+
+Import this repository as a Vite project in Vercel. Use `npm run build` as the build command and `dist` as the output directory. The app already uses same-origin `/api` requests, so it does not need a `VITE_API_BASE_URL` variable in production.
