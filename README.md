@@ -112,3 +112,27 @@ Frontend dan backend dikembangkan sebagai aplikasi yang terpisah.
         TypeScript + Vite             REST API
               │                           │
         Tailwind CSS                   MySQL
+```
+
+## Local development
+
+Install dependencies and start Vite:
+
+~~~bash
+npm ci
+npm run dev
+~~~
+
+The Vite development server proxies API and public storage requests to the Laravel development server at http://127.0.0.1:8000. Set VITE_API_PROXY_TARGET if the backend uses a different address. The frontend uses the same-origin /api path, so browser CORS configuration is not needed for this setup.
+
+## Docker
+
+The multi-stage Dockerfile builds the React application and serves the static files with Nginx. The Nginx container also forwards /api requests to the backend PHP-FPM service and serves public files from the shared storage volume.
+
+Build and run the complete stack from the backend repository directory. The Compose configuration builds this repository from its sibling folder:
+
+~~~bash
+docker compose -f compose.yaml --env-file .env.docker up -d --build
+~~~
+
+For local browser access, open http://localhost:8080. The published port is bound to the local machine only. In production, configure Nginx Proxy Manager to forward the application domain to the frontend service on port 80.
